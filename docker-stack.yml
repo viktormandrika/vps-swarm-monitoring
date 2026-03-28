@@ -1,6 +1,8 @@
 version: '3.8'
 
 networks:
+  swarm-network:
+    external: true
   monitoring:
     driver: overlay
     attachable: true
@@ -67,6 +69,14 @@ services:
     networks:
       - monitoring
       - proxy-network
+      - swarm-network
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.monitoring-grafana.rule=Host(`${GRAFANA_DOMAIN}`)
+      - traefik.http.routers.monitoring-grafana.entrypoints=websecure
+      - traefik.http.routers.monitoring-grafana.tls.certresolver=myresolver
+      - traefik.http.routers.monitoring-grafana.service=monitoring-grafana
+      - traefik.http.services.monitoring-grafana.loadbalancer.server.port=3000
     deploy:
       mode: replicated
       replicas: 1
@@ -80,13 +90,6 @@ services:
           memory: 64M
       restart_policy:
         condition: on-failure
-      labels:
-        - traefik.enable=true
-        - traefik.http.routers.monitoring-grafana.rule=Host(`${GRAFANA_DOMAIN}`)
-        - traefik.http.routers.monitoring-grafana.entrypoints=websecure
-        - traefik.http.routers.monitoring-grafana.tls.certresolver=myresolver
-        - traefik.http.routers.monitoring-grafana.service=monitoring-grafana
-        - traefik.http.services.monitoring-grafana.loadbalancer.server.port=3000
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.52.1
