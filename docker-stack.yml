@@ -56,6 +56,9 @@ services:
     image: grafana/grafana:11.6.0
     environment:
       - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_RENDERING_CONCURRENT_RENDER_LIMIT=4
+      - GF_DATAPROXY_TIMEOUT=60
+      - GF_DATAPROXY_DIAL_TIMEOUT=10
     volumes:
       - grafana_data:/var/lib/grafana
     configs:
@@ -83,9 +86,9 @@ services:
           - node.role == manager
       resources:
         limits:
-          memory: 256M
+          memory: 512M
         reservations:
-          memory: 64M
+          memory: 128M
       restart_policy:
         condition: on-failure
 
