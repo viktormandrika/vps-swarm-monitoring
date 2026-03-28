@@ -4,6 +4,8 @@ networks:
   monitoring:
     driver: overlay
     attachable: true
+  proxy-network:
+    external: true
 
 volumes:
   prometheus_data:
@@ -30,8 +32,6 @@ services:
       - prometheus_data:/prometheus
     networks:
       - monitoring
-    ports:
-      - "9090:9090"
     deploy:
       mode: replicated
       replicas: 1
@@ -58,8 +58,14 @@ services:
       - /opt/monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
     networks:
       - monitoring
-    ports:
-      - "3000:3000"
+      - proxy-network
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.monitoring-grafana.rule=Host(`${GRAFANA_DOMAIN}`)
+      - traefik.http.routers.monitoring-grafana.entrypoints=websecure
+      - traefik.http.routers.monitoring-grafana.tls.certresolver=myresolver
+      - traefik.http.routers.monitoring-grafana.service=monitoring-grafana
+      - traefik.http.services.monitoring-grafana.loadbalancer.server.port=3000
     deploy:
       mode: replicated
       replicas: 1
