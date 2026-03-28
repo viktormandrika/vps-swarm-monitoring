@@ -72,6 +72,7 @@ services:
       - swarm-network
     labels:
       - traefik.enable=true
+      - traefik.docker.network=swarm-network
       - traefik.http.routers.monitoring-grafana.rule=Host(`${GRAFANA_DOMAIN}`)
       - traefik.http.routers.monitoring-grafana.entrypoints=websecure
       - traefik.http.routers.monitoring-grafana.tls.certresolver=myresolver
