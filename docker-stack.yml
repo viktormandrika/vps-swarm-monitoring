@@ -84,6 +84,8 @@ services:
       placement:
         constraints:
           - node.role == manager
+      update_config:
+        order: stop-first
       resources:
         limits:
           memory: 512M
