@@ -55,7 +55,6 @@ services:
   grafana:
     image: grafana/grafana:11.6.0
     environment:
-      - GF_SECURITY_ADMIN_USER="gf.fitandyou.ru"
       - GF_USERS_ALLOW_SIGN_UP=false
     volumes:
       - grafana_data:/var/lib/grafana
@@ -71,7 +70,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=swarm-network
-      - traefik.http.routers.monitoring-grafana.rule=Host(`${GRAFANA_DOMAIN}`)
+      - traefik.http.routers.monitoring-grafana.rule=Host(`gf.fitandyou.ru`)
       - traefik.http.routers.monitoring-grafana.entrypoints=websecure
       - traefik.http.routers.monitoring-grafana.tls.certresolver=myresolver
       - traefik.http.routers.monitoring-grafana.service=monitoring-grafana
