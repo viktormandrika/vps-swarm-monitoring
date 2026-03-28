@@ -14,6 +14,10 @@ volumes:
 configs:
   prometheus_config:
     file: ./prometheus/prometheus.yml
+  grafana_datasources:
+    file: ./grafana/provisioning/datasources/prometheus.yml
+  grafana_dashboards_provider:
+    file: ./grafana/provisioning/dashboards/provider.yml
 
 services:
 
@@ -55,7 +59,11 @@ services:
       - GF_INSTALL_PLUGINS=grafana-piechart-panel
     volumes:
       - grafana_data:/var/lib/grafana
-      - /opt/monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+    configs:
+      - source: grafana_datasources
+        target: /etc/grafana/provisioning/datasources/prometheus.yml
+      - source: grafana_dashboards_provider
+        target: /etc/grafana/provisioning/dashboards/provider.yml
     networks:
       - monitoring
       - proxy-network
