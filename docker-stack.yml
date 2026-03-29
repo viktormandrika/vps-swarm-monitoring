@@ -12,6 +12,8 @@ networks:
 volumes:
   prometheus_data:
   grafana_data:
+  loki_data:
+
 
 configs:
   prometheus_config:
@@ -20,7 +22,10 @@ configs:
     file: ./grafana/provisioning/datasources/prometheus.yml
   grafana_dashboards_provider:
     file: ./grafana/provisioning/dashboards/provider.yml
-
+  loki_config:
+    file: ./loki/loki.yml
+  promtail_config:
+    file: ./promtail/promtail.yml
 services:
 
   prometheus:
@@ -141,3 +146,38 @@ services:
           memory: 32M
       restart_policy:
         condition: on-failure
+  loki:
+    image: grafana/loki:3.0.0
+    command: -config.file=/etc/loki/config.yml
+    configs:
+      - source: loki_config
+        target: /etc/loki/config.yml
+    volumes:
+      - loki_data:/loki
+    networks:
+      - monitoring
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          memory: 256M
+  promtail:
+    image: grafana/promtail:3.0.0
+    command: -config.file=/etc/promtail/config.yml
+    configs:
+      - source: promtail_config
+        target: /etc/promtail/config.yml
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    networks:
+      - monitoring
+    deploy:
+      mode: global  # на каждой ноде
+      resources:
+        limits:
+          memory: 128M
