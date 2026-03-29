@@ -20,6 +20,8 @@ configs:
     file: ./prometheus/prometheus.yml
   grafana_datasources:
     file: ./grafana/provisioning/datasources/prometheus.yml
+  grafana_loki_datasource:
+    file: ./grafana/provisioning/datasources/loki.yml
   grafana_dashboards_provider:
     file: ./grafana/provisioning/dashboards/provider.yml
   loki_config:
@@ -71,6 +73,8 @@ services:
         target: /etc/grafana/provisioning/datasources/prometheus.yml
       - source: grafana_dashboards_provider
         target: /etc/grafana/provisioning/dashboards/provider.yml
+      - source: grafana_loki_datasource
+        target: /etc/grafana/provisioning/datasources/loki.yml
     networks:
       - monitoring
       - proxy-network
