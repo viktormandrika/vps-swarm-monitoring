@@ -16,7 +16,7 @@ volumes:
 
 
 configs:
-  prometheus_config:
+  prometheus_config_v2:
     file: ./prometheus/prometheus.yml
   grafana_datasources:
     file: ./grafana/provisioning/datasources/prometheus.yml
@@ -39,7 +39,7 @@ services:
       - '--web.console.libraries=/usr/share/prometheus/console_libraries'
       - '--web.console.templates=/usr/share/prometheus/consoles'
     configs:
-      - source: prometheus_config
+      - source: prometheus_config_v2
         target: /etc/prometheus/prometheus.yml
     volumes:
       - prometheus_data:/prometheus
@@ -150,6 +150,30 @@ services:
           memory: 32M
       restart_policy:
         condition: on-failure
+
+  postgres_exporter:
+    image: quay.io/prometheuscommunity/postgres-exporter:v0.17.1
+    environment:
+      - DATA_SOURCE_URI=${POSTGRES_EXPORTER_DATA_SOURCE_URI:-postgres:5432/postgres?sslmode=disable}
+      - DATA_SOURCE_USER=${POSTGRES_EXPORTER_DATA_SOURCE_USER:-monitor}
+      - DATA_SOURCE_PASS=${POSTGRES_EXPORTER_DATA_SOURCE_PASS}
+    networks:
+      - monitoring
+      - swarm-network
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 32M
+      restart_policy:
+        condition: on-failure
+
   loki:
     image: grafana/loki:3.0.0
     command: -config.file=/etc/loki/config.yml

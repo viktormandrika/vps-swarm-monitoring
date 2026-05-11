@@ -36,3 +36,16 @@ scrape_configs:
         regex: '(.+):\d+'
         target_label: instance
         replacement: '$1'
+
+  # Метрики PostgreSQL через postgres_exporter
+  - job_name: 'postgres_exporter'
+    dns_sd_configs:
+      - names:
+          - 'tasks.postgres_exporter'
+        type: 'A'
+        port: 9187
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: '(.+):\d+'
+        target_label: instance
+        replacement: '$1'
