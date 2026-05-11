@@ -3,7 +3,7 @@ set -eu
 
 STACK_NAME="${STACK_NAME:-swarm-monitoring}"
 STACK_FILE="${STACK_FILE:-docker-stack.yml}"
-ENV_FILE="${1:-${POSTGRES_MONITORING_ENV_FILE:-./postgres-monitoring.env}}"
+ENV_FILE="${1:-${POSTGRES_MONITORING_ENV_FILE:-./.env}}"
 
 if [ ! -f "$ENV_FILE" ]; then
   echo "Env file not found: $ENV_FILE" >&2
